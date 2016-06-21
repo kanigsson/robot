@@ -1,79 +1,61 @@
 // connect motor controller pins to Arduino digital pins
 // motor one
-int enA = 10;
-int in1 = 9;
-int in2 = 8;
+int left_enable = 10;
+int left_in1 = 9;
+int left_in2 = 8;
 // motor two
-int enB = 5;
-int in3 = 7;
-int in4 = 6;
+int right_enable = 5;
+int right_in1 = 7;
+int right_in2 = 6;
+
+enum motorkind { left, right };
+
+void motor_drive (motorkind m, int speed) {
+  int in1, in2, set1, set2, enable;
+  if (speed == 0) {
+    set1 = LOW;
+    set2 = LOW;
+  } else if (speed > 0) {
+    set1 = HIGH;
+    set2 = LOW;
+  } else {
+    set1 = LOW;
+    set2 = HIGH;
+    speed = - speed;
+  }
+  if (m == left) {
+    in1 = left_in1;
+    in2 = left_in2;
+    enable = left_enable;
+  } else {
+    in1 = right_in1;
+    in2 = right_in2;
+    enable = right_enable;
+  }
+  digitalWrite(in1, set1);
+  digitalWrite(in2, set2);
+  analogWrite(enable, speed);
+}
+void straight(int speed) {
+  motor_drive(left, speed);
+  motor_drive(right, speed);
+}
+
 void setup()
 {
   // set all the motor control pins to outputs
-  pinMode(enA, OUTPUT);
-  pinMode(enB, OUTPUT);
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
+  pinMode(left_enable, OUTPUT);
+  pinMode(right_enable, OUTPUT);
+  pinMode(left_in1, OUTPUT);
+  pinMode(left_in2, OUTPUT);
+  pinMode(right_in1, OUTPUT);
+  pinMode(right_in2, OUTPUT);
 }
 
-void runmotor(int i) {
-  if (!i) {
-    digitalWrite(in1, HIGH);
-    digitalWrite(in2, LOW);
-    // set speed to 200 out of possible range 0~255
-    analogWrite(enA, 255);
-    delay(2000);    
-  } else {
-    digitalWrite(in3, HIGH);
-    digitalWrite(in4, LOW);
-    // set speed to 200 out of possible range 0~255
-    analogWrite(enB, 255);
-    delay(2000);    
-  }
-  // now turn off motors
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);  
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);  
-}
-
-
-void demoTwo()
-{
-  // this function will run the motors across the range of possible speeds
-  // note that maximum speed is determined by the motor itself and the operating voltage
-  // the PWM values sent by analogWrite() are fractions of the maximum speed possible 
-  // by your hardware
-  // turn on motors
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);  
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH); 
-  // accelerate from zero to maximum speed
-  for (int i = 0; i < 256; i++)
-  {
-    analogWrite(enA, i);
-    analogWrite(enB, i);
-    delay(20);
-  } 
-  // decelerate from maximum speed to zero
-  for (int i = 255; i >= 0; --i)
-  {
-    analogWrite(enA, i);
-    analogWrite(enB, i);
-    delay(20);
-  } 
-  // now turn off motors
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);  
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);  
-}
 void loop()
 {
-  runmotor(0);
-  delay(1000);
-  runmotor(1);
+  straight(255);
+  delay(3000);
+  straight(0);
+  delay(2000);
 }
