@@ -7,6 +7,9 @@ int left_in2 = 8;
 int right_enable = 5;
 int right_in1 = 7;
 int right_in2 = 6;
+// sonar range finder
+int trigger = 13;
+int echo = 12;
 
 enum motorkind { left, right };
 
@@ -36,9 +39,22 @@ void motor_drive (motorkind m, int speed) {
   digitalWrite(in2, set2);
   analogWrite(enable, speed);
 }
+
 void straight(int speed) {
   motor_drive(left, speed);
   motor_drive(right, speed);
+}
+
+int measuredistance() {
+   long duration, distance;
+   digitalWrite(trigger, LOW);
+   delayMicroseconds(2);
+   digitalWrite(trigger, HIGH);
+   delayMicroseconds(10);
+   digitalWrite(trigger, LOW);
+   duration = pulseIn(echo, HIGH);
+   distance = duration / 6;
+   return distance;
 }
 
 void setup()
@@ -50,12 +66,15 @@ void setup()
   pinMode(left_in2, OUTPUT);
   pinMode(right_in1, OUTPUT);
   pinMode(right_in2, OUTPUT);
+  pinMode(trigger, OUTPUT);
+  pinMode(echo, INPUT);
+  delay(10);
+  straight(100);
 }
 
 void loop()
 {
-  straight(255);
-  delay(3000);
-  straight(0);
-  delay(2000);
+  if (measuredistance() < 200) {
+    straight(0);
+  }
 }
