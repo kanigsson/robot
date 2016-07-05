@@ -66,15 +66,11 @@ void setup()
   pinMode(left_in2, OUTPUT);
   pinMode(right_in1, OUTPUT);
   pinMode(right_in2, OUTPUT);
-  pinMode(trigger, OUTPUT);
-  pinMode(echo, INPUT);
   delay(10);
-  straight(100);
+  straight(200);
 }
 
 void loop()
 {
-  if (measuredistance() < 200) {
-    straight(0);
-  }
+  delay(10);
 }
