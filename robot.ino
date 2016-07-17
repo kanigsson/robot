@@ -1,3 +1,5 @@
+#include "mouse.h"
+
 // connect motor controller pins to Arduino digital pins
 // motor one
 int left_enable = 10;
@@ -10,6 +12,9 @@ int right_in2 = 6;
 // sonar range finder
 int trigger = 13;
 int echo = 12;
+
+int left_speed = 150;
+int right_speed = 150;
 
 enum motorkind { left, right };
 
@@ -59,6 +64,9 @@ int measuredistance() {
 
 void setup()
 {
+Serial.begin(38400);  
+  Serial.println("start");
+  mouse_init(); 
   // set all the motor control pins to outputs
   pinMode(left_enable, OUTPUT);
   pinMode(right_enable, OUTPUT);
@@ -66,11 +74,39 @@ void setup()
   pinMode(left_in2, OUTPUT);
   pinMode(right_in1, OUTPUT);
   pinMode(right_in2, OUTPUT);
-  delay(10);
-  straight(200);
+  delay(50);
+  digitalWrite(13,HIGH);
+  //Serial.println("toto");
+    straight(150);  
+  digitalWrite(13,LOW);  
+}
+
+void adapt_speed(movement m) {
+  Serial.println(m.x);
+  if (m.x > 0) {
+    if (left_speed + right_speed > 300) {
+      right_speed -= m.x;
+      motor_drive(right, right_speed);
+    } else {
+      left_speed += m.x;
+      motor_drive(left, left_speed);
+    }
+  } else if (m.x < 0) {
+    if (left_speed + right_speed > 300) {
+      left_speed += m.x;
+      motor_drive(left, left_speed);
+    } else {
+      right_speed -= m.x;
+      motor_drive(right, right_speed);
+    }
+  }
 }
 
 void loop()
 {
   delay(10);
+  digitalWrite(13,HIGH);
+  delay(1);
+  adapt_speed(mouse_report());
+  digitalWrite(13,LOW);  
 }
