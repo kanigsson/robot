@@ -1,4 +1,4 @@
-#include "mouse.h"
+#include "PS2Mouse.h"
 
 // connect motor controller pins to Arduino digital pins
 // motor one
@@ -12,9 +12,11 @@ int right_in2 = 6;
 // sonar range finder
 int trigger = 13;
 int echo = 12;
+#define MOUSE_DATA 3
+#define MOUSE_CLOCK 4
 
-int left_speed = 150;
-int right_speed = 150;
+int left_speed = 200;
+int right_speed = 200;
 
 enum motorkind { left, right };
 
@@ -62,11 +64,14 @@ int measuredistance() {
    return distance;
 }
 
+PS2Mouse mouse(MOUSE_CLOCK, MOUSE_DATA, STREAM);
+
 void setup()
 {
 Serial.begin(38400);  
   Serial.println("start");
-  mouse_init(); 
+  mouse.initialize();
+  Serial.println("init");  
   // set all the motor control pins to outputs
   pinMode(left_enable, OUTPUT);
   pinMode(right_enable, OUTPUT);
@@ -75,16 +80,13 @@ Serial.begin(38400);
   pinMode(right_in1, OUTPUT);
   pinMode(right_in2, OUTPUT);
   delay(50);
-  digitalWrite(13,HIGH);
-  //Serial.println("toto");
-    straight(150);  
-  digitalWrite(13,LOW);  
+  straight(150);  
 }
 
 void adapt_speed(movement m) {
   Serial.println(m.x);
   if (m.x > 0) {
-    if (left_speed + right_speed > 300) {
+    if (left_speed + right_speed > 400) {
       right_speed -= m.x;
       motor_drive(right, right_speed);
     } else {
@@ -92,7 +94,7 @@ void adapt_speed(movement m) {
       motor_drive(left, left_speed);
     }
   } else if (m.x < 0) {
-    if (left_speed + right_speed > 300) {
+    if (left_speed + right_speed > 400) {
       left_speed += m.x;
       motor_drive(left, left_speed);
     } else {
@@ -104,9 +106,5 @@ void adapt_speed(movement m) {
 
 void loop()
 {
-  delay(10);
-  digitalWrite(13,HIGH);
-  delay(1);
-  adapt_speed(mouse_report());
-  digitalWrite(13,LOW);  
+  adapt_speed(mouse.report());  
 }

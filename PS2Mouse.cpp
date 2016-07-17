@@ -162,13 +162,15 @@ void PS2Mouse::write(int data) {
   pull_low(_clock_pin); // put a hold on the incoming data.
 }
 
-int * PS2Mouse::report(int data[]) {
+movement PS2Mouse::report() {
+  movement result;
+  byte tmp;
   write(0xeb); // Send Read Data
   read_byte(); // Read Ack Byte
-  data[0] = read(); // Status bit
-  data[1] = read_movement_x(data[0]); // X Movement Packet
-  data[2] = read_movement_y(data[0]); // Y Movement Packet
-  return data;
+  tmp = read(); // Status bit
+  result.x = read_movement_x(tmp); // X Movement Packet
+  result.y = read_movement_y(tmp); // Y Movement Packet
+  return result;
 }
 
 int PS2Mouse::read() {

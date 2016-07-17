@@ -4,6 +4,11 @@
 #define REMOTE 1
 #define STREAM 2
 
+typedef struct movement {
+  int x;
+  int y;
+} movement;
+
 class PS2Mouse
 {
   private:
@@ -26,7 +31,7 @@ class PS2Mouse
     int clock_pin();
     int data_pin();
     int read();
-    int* report(int data[]);
+    movement report();
     void write(int);
     void enable_data_reporting();
     void disable_data_reporting();
