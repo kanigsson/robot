@@ -68,10 +68,14 @@ PS2Mouse mouse(MOUSE_CLOCK, MOUSE_DATA, STREAM);
 
 void setup()
 {
-Serial.begin(38400);  
+Serial.begin(38400);
+  pinMode(13, OUTPUT);
+digitalWrite(13, LOW);
   Serial.println("start");
   mouse.initialize();
-  Serial.println("init");  
+  Serial.println("init");
+  
+  digitalWrite(13, HIGH);
   // set all the motor control pins to outputs
   pinMode(left_enable, OUTPUT);
   pinMode(right_enable, OUTPUT);
@@ -106,5 +110,6 @@ void adapt_speed(movement m) {
 
 void loop()
 {
+  delay(10);
   adapt_speed(mouse.report());  
 }
